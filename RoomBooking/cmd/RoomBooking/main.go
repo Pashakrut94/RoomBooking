@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Pashakrut94/cmd/RoomBooking/config"
+
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	// addr := config.viperConfigVariable("port")
+	addr := config.ViperConfigVariable("port")
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", Handler)
