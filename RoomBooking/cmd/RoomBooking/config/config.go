@@ -1,15 +1,19 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"log"
+
+	"github.com/spf13/viper"
+)
 
 // TODO: Error handling in general format
-func viperConfigVariable(key string) string {
+func ViperConfigVariable(key string) string {
 	viper.SetConfigName("config")
-	viper.AddConfigPath("./cmd/RoomBooking/config")
+	viper.AddConfigPath("/home/anduser/Documents/RoomBooking/config")
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("Error while reading config file %s", err)
+		log.Fatalf("Error while reading config file: %s", err)
 	}
 
 	value, ok := viper.Get(key).(string)
