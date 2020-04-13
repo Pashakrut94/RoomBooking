@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/Pashakrut94/cmd/RoomBooking/configuration"
-	"github.com/gorilla/mux"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/calendar/v3"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/Pashakrut94/cmd/RoomBooking/calendarAPI"
+	"github.com/Pashakrut94/cmd/RoomBooking/configuration"
+	"github.com/gorilla/mux"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/calendar/v3"
 )
 
 func main() {
@@ -24,7 +26,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-	client := GetClient(config)
+	client := calendarAPI.GetClient(config)
 
 	srv, err := calendar.New(client)
 	if err != nil {
