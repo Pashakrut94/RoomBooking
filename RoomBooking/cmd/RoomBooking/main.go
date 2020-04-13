@@ -4,12 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/Pashakrut94/cmd/RoomBooking/calendarAPI"
-	"github.com/Pashakrut94/cmd/RoomBooking/configuration"
-	"github.com/gorilla/mux"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
 )
@@ -51,18 +48,4 @@ func main() {
 			fmt.Printf("%v (%v)\n", item.Summary, date)
 		}
 	}
-
-	addr := configuration.ViperConfigVariable("port")
-
-	r := mux.NewRouter()
-	r.HandleFunc("/", Handler)
-	http.Handle("/", r)
-	fmt.Printf("Server starts at %s\n", addr)
-	http.ListenAndServe(addr, nil)
-
-	fmt.Println("hello!")
-}
-
-func Handler(w http.ResponseWriter, q *http.Request) {
-	fmt.Fprintf(w, "Congratz! You have a connection!")
 }
