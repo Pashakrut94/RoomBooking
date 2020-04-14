@@ -1,0 +1,5 @@
+package calendarAPI
+
+func HandleDeleteEvent() {
+
+}
