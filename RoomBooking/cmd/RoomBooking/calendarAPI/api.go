@@ -4,12 +4,44 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/calendar/v3"
 )
+
+var (
+	CalendarId = os.Getenv("CALENDAR_ID")
+	TimeZone   = os.Getenv("TIME_ZONE")
+)
+
+// Creates a new Service. It uses the provided http.Client for requests.
+func CreateService() (srv *calendar.Service, err error) {
+	b, err := ioutil.ReadFile("credentials.json")
+	if err != nil {
+		log.Fatalf("Unable to read client secret file: %v", err)
+		return nil, err
+	}
+
+	// If modifying these scopes, delete your previously saved token.json.
+	config, err := google.ConfigFromJSON(b, calendar.CalendarEventsScope)
+	if err != nil {
+		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		return nil, err
+	}
+	client := GetClient(config)
+
+	srv, err = calendar.New(client)
+	if err != nil {
+		log.Fatalf("Unable to retrieve Calendar client: %v", err)
+		return nil, err
+	}
+	return srv, nil
+}
 
 // Retrieve a token, saves the token, then returns the generated client.
 func GetClient(config *oauth2.Config) *http.Client {
