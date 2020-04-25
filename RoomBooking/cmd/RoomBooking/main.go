@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"log"
 	"os"
 
-	"github.com/Pashakrut94/cmd/RoomBooking/calendarAPI"
-	"github.com/gorilla/mux"
+	"github.com/Pashakrut94/cmd/RoomBooking/telegramAPI"
 )
 
 var (
@@ -14,12 +12,18 @@ var (
 )
 
 func main() {
-	router := mux.NewRouter()
+	bot, err := telegramAPI.BotConnection()
+	if err != nil {
+		log.Fatalf("unable to register bot %s:", err)
+	}
+	telegramAPI.GetUpdates(bot)
 
-	router.HandleFunc("/api/create", calendarAPI.CreateEvent())
-	router.HandleFunc("/api/list", calendarAPI.ListEvents())
+	// router := mux.NewRouter()
 
-	http.Handle("/", router)
-	fmt.Printf("Server starts at %s\n", localHost)
-	http.ListenAndServe(localHost, nil)
+	// router.HandleFunc("/api/create", calendarAPI.CreateEvent())
+	// router.HandleFunc("/api/list", calendarAPI.ListEvents())
+
+	// http.Handle("/", router)
+	// fmt.Printf("Server starts at %s\n", localHost)
+	// http.ListenAndServe(localHost, nil)
 }
