@@ -8,7 +8,6 @@ import (
 )
 
 func HandleCreateEvent(evnt Event) error {
-
 	srv, err := CreateService()
 	if err != nil {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
