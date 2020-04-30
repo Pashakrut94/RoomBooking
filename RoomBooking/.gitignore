@@ -1,1 +1,4 @@
 go.sum
+/cmd/RoomBooking/credentials.json
+/cmd/RoomBooking/token.json
+/cmd/RoomBooking/RoomBooking
