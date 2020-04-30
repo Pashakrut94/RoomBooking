@@ -13,7 +13,7 @@ import (
 var (
 	BotPort    = os.Getenv("BOT_PORT")
 	BotToken   = os.Getenv("BOT_TOKEN")
-	WebHookURL = "https://56eedd09.ngrok.io"
+	WebHookURL = "https://464a87c6.ngrok.io"
 )
 
 // Register telegram bot with BotToken
@@ -56,9 +56,16 @@ func GetUpdates(bot *tgbotapi.BotAPI) {
 			case "DeleteEvent":
 				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Handler for delete events")
 				bot.Send(msg)
+			case "MainMenu":
+				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Main menu")
+				msg.ReplyMarkup = mainMenu
+				bot.Send(msg)
+			default:
+				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Choose the time you want to book")
+				msg.ReplyMarkup = timeMenu
+				bot.Send(msg)
 			}
 		}
-
 		if update.Message != nil {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			switch update.Message.Text {
