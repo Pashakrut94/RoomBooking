@@ -17,6 +17,20 @@ var (
 		"Saturday": 6,
 		"Sunday":   7,
 	}
+	monthes = map[string]string{
+		"January":   "01",
+		"February":  "02",
+		"March":     "03",
+		"April":     "04",
+		"May":       "05",
+		"June":      "06",
+		"July":      "07",
+		"August":    "08",
+		"September": "09",
+		"October":   "10",
+		"November":  "11",
+		"December":  "12",
+	}
 )
 
 //Generate slice with days for menu buttons
@@ -30,8 +44,7 @@ func GenerateDays() (days [][]string) {
 	return days
 }
 
-//Return true if today is a weeekend day,
-//return false if today is a weekday
+//Return true if today is a weeekend day, return false if today is a weekday
 func weekEnd(today time.Time) bool {
 	todayWeekDay := today.Weekday().String()
 	if _, ok := weekEndDays[todayWeekDay]; ok {
@@ -88,16 +101,19 @@ func generateDaysForButtonsWeekEnd(today time.Time) (days [][]string) {
 	return
 }
 
-//Returns (today + n) day's weekday and date in such format: ["Friday","24 April"]
+//Returns (today + n) day's weekday and date in such format: ["Thursday 30.04", "2020-04-30"]
 func nextDay(today time.Time, n int) (weekDayWithDate []string) {
 	weekDayWithDate = make([]string, 0, 2)
 	nextDay := today.AddDate(0, 0, n)
 
-	nextDayWeekDay := nextDay.Weekday().String()
+	callBackDate := nextDay.Format("2006-01-02")
 
-	_, month, date := nextDay.Date()
-	nextDayDateMonth := strconv.Itoa(date) + " " + month.String()
+	_, month, day := nextDay.Date()
+	nextDayMonth := month.String()
+	numericMonth := monthes[nextDayMonth]
+	weekDay := nextDay.Weekday().String()
+	nextDayDateMonth := weekDay + " " + strconv.Itoa(day) + "." + numericMonth
 
-	weekDayWithDate = append(weekDayWithDate, nextDayWeekDay, nextDayDateMonth)
+	weekDayWithDate = append(weekDayWithDate, nextDayDateMonth, callBackDate)
 	return
 }

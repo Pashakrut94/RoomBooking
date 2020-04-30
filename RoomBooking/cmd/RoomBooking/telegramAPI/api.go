@@ -13,7 +13,7 @@ import (
 var (
 	BotPort    = os.Getenv("BOT_PORT")
 	BotToken   = os.Getenv("BOT_TOKEN")
-	WebHookURL = "https://def41599.ngrok.io"
+	WebHookURL = "https://56eedd09.ngrok.io"
 )
 
 // Register telegram bot with BotToken
@@ -40,27 +40,32 @@ func BotConnection() (bot *tgbotapi.BotAPI, err error) {
 // Makes channel updates, which implements client-server model
 func GetUpdates(bot *tgbotapi.BotAPI) {
 	updates := bot.ListenForWebhook("/")
+
 	for update := range updates {
-
-		if update.Message.IsCommand() {
-			cmdText := update.Message.Command()
-			if cmdText == "menu" {
-				menuMessage := tgbotapi.NewMessage(update.Message.Chat.ID, "Main menu")
-				menuMessage.ReplyMarkup = mainMenu
-				bot.Send(menuMessage)
+		if update.CallbackQuery != nil {
+			bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data))
+			switch update.CallbackQuery.Data {
+			case "ListEvents":
+				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Handler for list events")
+				bot.Send(msg)
+			case "CreateEvent":
+				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Choose the day you want to book")
+				daysMenu := daysButtonsColumn()
+				msg.ReplyMarkup = daysMenu
+				bot.Send(msg)
+			case "DeleteEvent":
+				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Handler for delete events")
+				bot.Send(msg)
 			}
-		} else {
-			if update.Message.Text == mainMenu.Keyboard[0][0].Text { //list
-
-			} else if update.Message.Text == mainMenu.Keyboard[0][1].Text { //create
-				dayMessage := tgbotapi.NewMessage(update.Message.Chat.ID, "Choose the day you want to book")
-				dayMessage.ReplyMarkup = daysMenu
-				bot.Send(dayMessage)
-			} else if update.Message.Text == mainMenu.Keyboard[0][2].Text { //delete
-
-			}
-
 		}
 
+		if update.Message != nil {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+			switch update.Message.Text {
+			case "/menu":
+				msg.ReplyMarkup = mainMenu
+			}
+			bot.Send(msg)
+		}
 	}
 }
