@@ -17,6 +17,9 @@ func generateDaysButtons() (dates, callBackData []string) {
 // Produce buttons for create event related to days of the week in a column format
 func daysButtonsColumn() (daysMenu tgbotapi.InlineKeyboardMarkup) {
 	var buttons [][]tgbotapi.InlineKeyboardButton
+	backButton := tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("<< Back to main menu", "MainMenu"),
+	)
 	dates, callBackData := generateDaysButtons()
 	for i := 0; i < len(dates); i++ {
 		button := tgbotapi.NewInlineKeyboardRow(
@@ -24,6 +27,7 @@ func daysButtonsColumn() (daysMenu tgbotapi.InlineKeyboardMarkup) {
 		)
 		buttons = append(buttons, button)
 	}
+	buttons = append(buttons, backButton)
 	daysMenu = tgbotapi.NewInlineKeyboardMarkup(buttons...)
 	return
 }
