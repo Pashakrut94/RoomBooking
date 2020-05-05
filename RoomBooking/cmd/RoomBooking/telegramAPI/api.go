@@ -13,7 +13,7 @@ import (
 var (
 	BotPort    = os.Getenv("BOT_PORT")
 	BotToken   = os.Getenv("BOT_TOKEN")
-	WebHookURL = "https://464a87c6.ngrok.io"
+	WebHookURL = "https://f624a7bd.ngrok.io"
 )
 
 // Register telegram bot with BotToken
@@ -43,7 +43,7 @@ func GetUpdates(bot *tgbotapi.BotAPI) {
 
 	for update := range updates {
 		if update.CallbackQuery != nil {
-			bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data))
+			bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)) // Нотификация нажатия твоей скрытой data за кнопкой
 			switch update.CallbackQuery.Data {
 			case "ListEvents":
 				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Handler for list events")
