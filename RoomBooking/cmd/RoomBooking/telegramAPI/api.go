@@ -2,77 +2,96 @@ package telegramAPI
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-	"os"
 
+	create "github.com/Pashakrut94/cmd/RoomBooking/telegramAPI/create"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
-// Making connection through ngrok WebHookURL
-var (
-	BotPort    = os.Getenv("BOT_PORT")
-	BotToken   = os.Getenv("BOT_TOKEN")
-	WebHookURL = "https://464a87c6.ngrok.io"
-)
+type CreateEvent struct {
+	UserLastName string `json:"user_last_name"`
+	Date         string `json:"date"`
+	StartTime    string `json:"start_time"`
+	EndTime      string `json:"end_time"`
+	Location     string `json:"location"`
+	Summary      string `json:"summary"`
 
-// Register telegram bot with BotToken
-func BotConnection() (bot *tgbotapi.BotAPI, err error) {
-	bot, err = tgbotapi.NewBotAPI(BotToken)
-	if err != nil {
-		log.Fatalf("unable to register new bot with this token: %v\n", err)
-		return nil, err
-	}
-	fmt.Printf("Authorized on account %s\n", bot.Self.UserName)
-
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(WebHookURL))
-	if err != nil {
-		log.Fatalf("unable to set webhook %v: %v\n", WebHookURL, err)
-		return nil, err
-	}
-
-	go http.ListenAndServe(BotPort, nil)
-	fmt.Printf("listening on %v\n", BotPort)
-
-	return bot, nil
+	// Description string `json:"description"` // Description add to struct of CalendarAPI: "AndersenBookingBot: made by %v, at %v", UserLastName, time.Now()
 }
+
+type UserMessage struct {
+	LastID string
+}
+
+var (
+	createEventMap map[int]*CreateEvent
+	message        map[int]*UserMessage
+)
 
 // Makes channel updates, which implements client-server model
 func GetUpdates(bot *tgbotapi.BotAPI) {
 	updates := bot.ListenForWebhook("/")
-
+	lastID := 0 //Сделать структуру message (у каждого свой lastID) Message{UserID: int, lastID: int}
+	// userLastName := update.CallbackQuery.From.LastName // Фамилия
+	// userID := update.CallbackQuery.From.UserID // Число
 	for update := range updates {
-		if update.CallbackQuery != nil {
-			bot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data))
-			switch update.CallbackQuery.Data {
-			case "ListEvents":
-				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Handler for list events")
-				bot.Send(msg)
-			case "CreateEvent":
-				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Choose the day you want to book")
-				daysMenu := daysButtonsColumn()
-				msg.ReplyMarkup = daysMenu
-				bot.Send(msg)
-			case "DeleteEvent":
-				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Handler for delete events")
-				bot.Send(msg)
-			case "MainMenu":
-				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Main menu")
-				msg.ReplyMarkup = mainMenu
-				bot.Send(msg)
-			default:
-				msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, "Choose the time you want to book")
-				msg.ReplyMarkup = timeMenu
-				bot.Send(msg)
-			}
-		}
+
 		if update.Message != nil {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			switch update.Message.Text {
-			case "/menu":
-				msg.ReplyMarkup = mainMenu
+			cmdText := update.Message.Command()
+			switch cmdText {
+			case "menu":
+
+				if lastID != 0 && update.CallbackQuery != nil {
+					msg := tgbotapi.NewEditMessageText(update.CallbackQuery.Message.Chat.ID, lastID, "Main menu")
+					msg.ReplyMarkup = &mainMenu
+					ms, _ := bot.Send(msg)
+					lastID = ms.MessageID
+				} else {
+					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Main menu")
+					msg.ReplyMarkup = mainMenu
+					ms, _ := bot.Send(msg)
+					lastID = ms.MessageID
+				}
 			}
-			bot.Send(msg)
+
+		} else {
+
+			if update.CallbackQuery != nil {
+				fmt.Println(update.CallbackQuery.Data)
+
+				switch update.CallbackQuery.Data {
+
+				case "ListEvents":
+					msg := tgbotapi.NewEditMessageText(update.CallbackQuery.Message.Chat.ID, lastID, "List events handler")
+					fmt.Println(userID)
+					msg.ReplyMarkup = &listMenu
+					ms, _ := bot.Send(msg)
+					lastID = ms.MessageID
+				case "CreateEvent":
+					msg := tgbotapi.NewEditMessageText(update.CallbackQuery.Message.Chat.ID, lastID, "Choose the day you want to book")
+					daysMenu := create.DaysButtonsColumn()
+					msg.ReplyMarkup = &daysMenu
+					ms, _ := bot.Send(msg)
+					lastID = ms.MessageID
+				case "DeleteEvent":
+					msg := tgbotapi.NewEditMessageText(update.CallbackQuery.Message.Chat.ID, lastID, "Delete event handler")
+					msg.ReplyMarkup = &deleteMenu
+					ms, _ := bot.Send(msg)
+					lastID = ms.MessageID
+				case "MainMenu":
+					msg := tgbotapi.NewEditMessageText(update.CallbackQuery.Message.Chat.ID, lastID, "Main menu")
+					msg.ReplyMarkup = &mainMenu
+					ms, _ := bot.Send(msg)
+					lastID = ms.MessageID
+				case "2020-05-08": // data from create handler
+					msg := tgbotapi.NewEditMessageText(update.CallbackQuery.Message.Chat.ID, lastID, "Choose time you want to book")
+					msg.ReplyMarkup = &timeMenu
+					ms, _ := bot.Send(msg)
+					lastID = ms.MessageID
+				}
+
+			}
+
 		}
+
 	}
 }

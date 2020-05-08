@@ -73,6 +73,6 @@ var timeMenu = tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardButtonData("17:45", "T17:45:00"),
 	),
 	tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonData("<< Back to choose day", "CreateEvent"),
+		tgbotapi.NewInlineKeyboardButtonData("🔙 Back to choose day", "CreateEvent"),
 	),
 )
