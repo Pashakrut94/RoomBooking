@@ -20,10 +20,10 @@ func DaysButtonsColumn() (daysMenu tgbotapi.InlineKeyboardMarkup) {
 	backButton := tgbotapi.NewInlineKeyboardRow(
 		tgbotapi.NewInlineKeyboardButtonData("🔙 Back to main menu", "MainMenu"),
 	)
-	dates, callBackData := generateDaysButtons()
+	dates, _ := generateDaysButtons()
 	for i := 0; i < len(dates); i++ {
 		button := tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData(dates[i], callBackData[i]),
+			tgbotapi.NewInlineKeyboardButtonData(dates[i], "Date"),
 		)
 		buttons = append(buttons, button)
 	}
