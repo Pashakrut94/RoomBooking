@@ -13,7 +13,7 @@ import (
 var (
 	BotPort    = os.Getenv("BOT_PORT")
 	BotToken   = os.Getenv("BOT_TOKEN")
-	WebHookURL = "https://4fb1928c.ngrok.io"
+	WebHookURL = "https://80d45ab4.ngrok.io"
 )
 
 // Register telegram bot with BotToken
